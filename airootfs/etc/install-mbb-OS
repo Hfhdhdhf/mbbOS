@@ -10,12 +10,7 @@ arch-chroot /mnt <<EOF
 ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 hwclock --systohc
 echo "hostname" > /etc/hostname
-
-# Set root password
-echo "root:mbbOS" | chpasswd
-
-# Create a new user and set password
-echo "mbbOS:mbbOS" | chpasswd
+useradd mbbOS
 EOF
 
 # Install GNOME
@@ -31,5 +26,11 @@ EOF
 arch-chroot /mnt <<EOF
 systemctl enable gdm
 EOF
-
+echo "time to set up the passwords"
+arch-chroot /mnt <<EOF
+passwd root
+EOF
+arch-chroot /mnt <<EOF
+passwd mbbOS
+EOF
 echo "Done. Just reboot now."
