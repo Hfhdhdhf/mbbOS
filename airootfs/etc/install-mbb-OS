@@ -1,0 +1,35 @@
+#!/bin/bash
+
+echo "Only run this when you're done partitioning and mounting."
+
+# Install base packages
+pacstrap /mnt linux linux-firmware base base-devel grub efibootmgr networkmanager neovim
+
+# Enter the new system
+arch-chroot /mnt <<EOF
+ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+hwclock --systohc
+echo "hostname" > /etc/hostname
+
+# Set root password
+echo "root:mbbOS" | chpasswd
+
+# Create a new user and set password
+echo "mbbOS:mbbOS" | chpasswd
+EOF
+
+# Install GNOME
+pacstrap /mnt gnome
+
+# Configure bootloader
+arch-chroot /mnt <<EOF
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=mbbOS --removable --force --verbose
+grub-mkconfig -o /boot/grub/grub.cfg
+EOF
+
+# Enable GDM (GNOME Display Manager)
+arch-chroot /mnt <<EOF
+systemctl enable gdm
+EOF
+
+echo "Done. Just reboot now."
